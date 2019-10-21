@@ -1,0 +1,72 @@
+[
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g   -o CMakeFiles/PosEstEx.dir/PosEstimate/main.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/main.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/main.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CFuncHelper.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFuncHelper.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFuncHelper.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CMap.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CMap.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CMap.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/COptimizer.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/COptimizer.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/COptimizer.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CFrame.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFrame.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFrame.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CFeatureTrack.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFeatureTrack.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFeatureTrack.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CORBextractor.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CORBextractor.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CORBextractor.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CORBmatcher.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CORBmatcher.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CORBmatcher.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CMapDrawer.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CMapDrawer.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CMapDrawer.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CFrameDrawer.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFrameDrawer.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CFrameDrawer.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/PosEstimate/sources/CViewer.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CViewer.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/sources/CViewer.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/source/Monocular_DataLoader.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_DataLoader.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_DataLoader.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/source/Monocular_Config.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_Config.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_Config.cpp"
+},
+{
+  "directory": "/media/navinfo/Work/MyProject/Monocular_Positioning/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DCOMPILEDWITHC11 -DPosEstimate_EXPORTS -I/media/navinfo/Work/MyProject/Monocular_Positioning -I/media/navinfo/Work/MyProject/Monocular_Positioning/include -I/media/navinfo/Work/MyProject/Monocular_Positioning/PosEstimate/include -I/usr/local/include/eigen3 -isystem /media/navinfo/Work/GitHub/Pangolin/include -isystem /media/navinfo/Work/GitHub/Pangolin/build/src/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -Wall -g -march=native -std=c++14 -g -fPIC   -o CMakeFiles/PosEstimate.dir/source/Monocular_CoorTransform.cpp.o -c /media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_CoorTransform.cpp",
+  "file": "/media/navinfo/Work/MyProject/Monocular_Positioning/source/Monocular_CoorTransform.cpp"
+}
+]

@@ -1,0 +1,11 @@
+{
+    "cmake.configureOnOpen": true,
+    "files.exclude": {
+        ".gitignore": true,
+        "cmake_install.cmake": true,
+        "CMakeCache.txt": true,
+        "CMakeFiles": true,
+        "lib": true,
+        "Output": true
+    }
+}
