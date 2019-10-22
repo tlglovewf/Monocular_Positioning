@@ -94,13 +94,20 @@ public:
     /* 加载数据
      * @param path 数据路径
     */
-    virtual bool loadDatas(const std::string &path) = 0;
+    virtual bool loadData(const std::string &path) = 0;
 
     /* 获取数据
      * @param second 时间
      * @return imu原始数据
     */
-    virtual ImuRawData getDatas(double second) = 0;
+    virtual ImuRawData getData(double second) = 0;
+
+    /* 获取数据
+     * @param bgsec 开始时间 
+     * @param edsec 结束时间
+     * @return      时间间隔数据集
+    */
+    virtual IMURawVector getDatas(double bgsec, double edsec) = 0;
 protected:
     IMURawVector mRawDatas;
 };
@@ -113,13 +120,25 @@ public:
     /* 加载数据
      * @param path 数据路径
     */
-    virtual bool loadDatas(const std::string &path) ;
+    virtual bool loadData(const std::string &path) ;
 
     /* 获取数据
      * @param second 时间
      * @return imu原始数据
     */
-    virtual  ImuRawData getDatas(double second);
+    virtual  ImuRawData getData(double second);
+
+    /* 获取数据
+     * @param bgsec 开始时间 
+     * @param edsec 结束时间
+     * @return      时间间隔数据集
+    */
+    virtual IMURawVector getDatas(double bgsec, double edsec);
+
+protected:
+    /*  获取数据
+     */
+    ImuRawData getRawData(double sec, const IMURawVIter &it); 
 
 protected:
     IMURawVector mDatas;

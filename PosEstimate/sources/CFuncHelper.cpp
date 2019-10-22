@@ -45,7 +45,7 @@ int loadFiles( const std::string &dirpath, FileNameVec &files )
         }
     }
     closedir(dp);
-    
+    sort(files.begin(),files.end());
     return index;
 }
 

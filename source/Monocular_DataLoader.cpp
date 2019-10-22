@@ -16,8 +16,8 @@ using namespace std;
 #define ISREAL 1          // 是否取真值(post文件)
 #define POSTHEADLINENO 50 //post头文件指定长度
 
-#define POSTMAXREADLENGTH       1e5
-#define IMURAWMAXREADLENGTH     3e5
+#define POSTMAXREADLENGTH 1e5
+#define IMURAWMAXREADLENGTH 3e5
 
 /*
  *  加载数据
@@ -34,7 +34,7 @@ PoseVector &Stim300PostTDataLoader::loadData(const std::string &path)
         Time_Interval interval;
         interval.start();
 
-        cout << "Imu datas begin loading !!!" << endl;
+        cout << "stim300 pst datas begin loading !!!" << endl;
 
         if (file.is_open())
         {
@@ -62,7 +62,7 @@ PoseVector &Stim300PostTDataLoader::loadData(const std::string &path)
 
             int index = 0;
 
-            while (!file.eof() && ++index < POSTMAXREADLENGTH)
+            while (!file.eof()) // && ++index < POSTMAXREADLENGTH)
             {
                 PoseData item;
                 getline(file, str);
@@ -86,7 +86,7 @@ PoseVector &Stim300PostTDataLoader::loadData(const std::string &path)
 
                 mPoseDatas.emplace_back(item);
             }
-            std::cout << mPoseDatas.size() << "imu datas are loaded!!!" << std::endl;
+            std::cout << mPoseDatas.size() << "pst datas load successfully!!!" << std::endl;
             interval.prompt("It takes ");
         }
         resetIndicator();
@@ -98,7 +98,7 @@ PoseVector &Stim300PostTDataLoader::loadData(const std::string &path)
 
     return mPoseDatas;
 }
-template<typename T>
+template <typename T>
 class Cmp
 {
 public:
@@ -168,7 +168,7 @@ PoseVector &Imu5651DataLoader::loadData(const std::string &path)
 /* 加载数据
      * @param path 数据路径
     */
-bool  STIM300IMURawDataLoader::loadDatas(const std::string &path)
+bool STIM300IMURawDataLoader::loadData(const std::string &path)
 {
     if (!path.empty())
     {
@@ -176,13 +176,13 @@ bool  STIM300IMURawDataLoader::loadDatas(const std::string &path)
         try
         {
             fs.open(path);
-
+            cout << "begin loading imu raw data." << endl;
             std::string txtline;
 
             //get headline
             getline(fs, txtline);
             int index = 0;
-            while (!fs.eof() && (index++ < IMURAWMAXREADLENGTH))
+            while (!fs.eof()) // && (index++ < IMURAWMAXREADLENGTH))
             {
                 getline(fs, txtline);
                 double t;
@@ -199,6 +199,7 @@ bool  STIM300IMURawDataLoader::loadDatas(const std::string &path)
             }
             mIndicator = mDatas.begin();
             fs.close();
+            cout << "load imu raw data successfully!!!" << endl;
             return true;
         }
         catch (const std::exception &e)
@@ -213,13 +214,45 @@ bool  STIM300IMURawDataLoader::loadDatas(const std::string &path)
      * @param second 时间
      * @return imu原始数据
     */
-ImuRawData STIM300IMURawDataLoader::getDatas(double second)
+ImuRawData STIM300IMURawDataLoader::getData(double second)
 {
     const IMURawVIter iter = std::find_if(mIndicator, mDatas.end(), Cmp<ImuRawData>(second));
-    int index = static_cast<int>(iter - mDatas.begin());
+    
+    return getRawData(second, iter);
+}
+
+/* 获取数据
+     * @param bgsec 开始时间 
+     * @param edsec 结束时间
+     * @return      时间间隔数据集
+    */
+IMURawVector STIM300IMURawDataLoader::getDatas(double bgsec, double edsec)
+{
+    IMURawVector tmp;
+
+    const IMURawVIter bgiter = std::find_if(mIndicator, mDatas.end(), Cmp<ImuRawData>(bgsec));
+    const IMURawVIter editer = std::find_if(mIndicator, mDatas.end(), Cmp<ImuRawData>(edsec));
+
+    //first data
+    tmp.emplace_back(getRawData(bgsec, bgiter));
+    for (IMURawVIter it = bgiter; it < editer; ++it)
+    {
+        tmp.emplace_back(*it);
+    }
+    //last data
+    tmp.emplace_back(getRawData(edsec,editer));
+
+    return tmp;
+}
+
+/*  获取数据
+     */
+ImuRawData STIM300IMURawDataLoader::getRawData(double sec, const IMURawVIter &it)
+{
+    int index = static_cast<int>(it - mDatas.begin());
 
     assert(index < mDatas.size() && index > 0);
-    mIndicator = iter;
+    mIndicator = it;
     const ImuRawData &predata = mDatas[index - 1];
     const ImuRawData &nxtdata = mDatas[index];
 
@@ -229,14 +262,14 @@ ImuRawData STIM300IMURawDataLoader::getDatas(double second)
     cout << nxtdata._t << endl;
 
     //拉格朗日差值
-    double gx = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._gyro_x, nxtdata._gyro_x);
-    double gy = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._gyro_y, nxtdata._gyro_y);
-    double gz = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._gyro_z, nxtdata._gyro_z);
+    double gx = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._gyro_x, nxtdata._gyro_x);
+    double gy = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._gyro_y, nxtdata._gyro_y);
+    double gz = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._gyro_z, nxtdata._gyro_z);
 
-    double ax = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._acc_x, nxtdata._acc_x);
-    double ay = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._acc_y, nxtdata._acc_y);
-    double az = M_Untils::GetLxValue(second, predata._t, nxtdata._t, predata._acc_z, nxtdata._acc_x);
+    double ax = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._acc_x, nxtdata._acc_x);
+    double ay = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._acc_y, nxtdata._acc_y);
+    double az = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._acc_z, nxtdata._acc_x);
 
-    cout << "get data : " << second << " " << gx << " " << gy << " " << gz << " " << ax << " " << ay << " " << az << endl;
-    return ImuRawData(second, gx, gy, gz, ax, ay, az);
+    cout << "get data : " << sec << " " << gx << " " << gy << " " << gz << " " << ax << " " << ay << " " << az << endl;
+    return ImuRawData(sec, gx, gy, gz, ax, ay, az);
 }
