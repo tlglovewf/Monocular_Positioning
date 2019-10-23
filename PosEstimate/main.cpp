@@ -21,6 +21,8 @@
 
 #include "algorithm"
 
+#include "CDataManager.h"
+
 using namespace cv;
 using namespace std;
 
@@ -188,8 +190,8 @@ void PreprocessData(const std::string &imgpath,
             {//from second frame
                 edtime = imgtime;
                 IMURawVector rawdatas(pIMUDataloader->getDatas(bgtime, edtime));
-
-                for (size_t i = 0; i < rawdatas.size(); ++i)
+                const int sti = (i == 1) ? 0 : 1;
+                for (size_t i = sti; i < rawdatas.size(); ++i)
                 {
                     WRITEIMURAWDATA(pImu, rawdatas[i]._t,
                                     rawdatas[i]._gyro_x,
@@ -223,15 +225,43 @@ int main(int argc, const char *argv[])
 
     // cout << cvtwk2dytime(285481.556158) << endl;
 
-    PreprocessData(s_imgGray, s_pstpath, s_imupath, s_imgGray + "/pstdatas.txt",
-                   s_imgGray + "/imudatas.txt");
+    //PreprocessData(s_imgGray, s_pstpath, s_imupath, s_imgGray + "/pstdatas.txt",
+    //               s_imgGray + "/imudatas.txt");
 
-    // IMURawDataLoader *pLoader = new STIM300IMURawDataLoader();
+    if(CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",
+                  s_imgGray + "/imudatas.txt"))
+    {
+        ImgInfoVIter it = CDataManager::getSingleton()->begin();
+        ImgInfoVIter ed = CDataManager::getSingleton()->end();
 
-    // pLoader->loadData("/media/navinfo/Bak/Datas/@@1002-0001-190828-00/imu/imu190828_071742.txt");
+        int index = 0;
+        cout.precision(20);
+        for(;it != ed; ++it)
+        {
+            cout << it->first.c_str() << endl;
+            cout << it->second.pos.longitude << endl;
+            if(index++ > 100)
+            {
+               IMURawVector datas =  CDataManager::getSingleton()->getIMUDataFromLastTime(it->second._t);
+               cout << datas.begin()->_t << endl;
+               cout << datas.rbegin()->_t << endl;
+               break;
+            }
+            else if(index++ > 50)
+            {
+               IMURawVector datas =  CDataManager::getSingleton()->getIMUDataFromLastTime(it->second._t);
+               cout << datas.begin()->_t << endl;
+               cout << datas.rbegin()->_t << endl;
+            }
+            else
+            {
+                ;
+            }
+            
+        }
+    }
+    
 
-    // const ImuRawData &data1 = pLoader->getData(26467.320);
-    // const ImuRawData &data2 = pLoader->getData(26467.590);
     return 0;
 
     FrameDrawer *pFdrawer = NULL;

@@ -270,6 +270,6 @@ ImuRawData STIM300IMURawDataLoader::getRawData(double sec, const IMURawVIter &it
     double ay = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._acc_y, nxtdata._acc_y);
     double az = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._acc_z, nxtdata._acc_x);
 
-    cout << "get data : " << sec << " " << gx << " " << gy << " " << gz << " " << ax << " " << ay << " " << az << endl;
+    //cout << "get data : " << sec << " " << gx << " " << gy << " " << gz << " " << ax << " " << ay << " " << az << endl;
     return ImuRawData(sec, gx, gy, gz, ax, ay, az);
 }

@@ -61,6 +61,7 @@ PosEstimate/sources/CORBmatcher.cpp
 PosEstimate/sources/CMapDrawer.cpp
 PosEstimate/sources/CFrameDrawer.cpp
 PosEstimate/sources/CViewer.cpp
+PosEstimate/sources/CDataManager.cpp
 source/Monocular_DataLoader.cpp
 source/Monocular_Config.cpp
 source/Monocular_CoorTransform.cpp
