@@ -1,15 +1,15 @@
 //
-//  Monocular_Config.h
-//  MonocularPositioning
+//  M_Config.h
+//  
 //
 //  Created by TuLigen on 2019/6/4.
 //  Copyright © 2019年 TuLigen. All rights reserved.
 //
 
-#ifndef Monocular_Config_h
-#define Monocular_Config_h
+#ifndef _M_CONFIG_H_H_
+#define _M_CONFIG_H_H_
 
-#include "Monocular_Types.h"
+#include "M_Types.h"
 /*
  * 配置接口类
  */

@@ -8,17 +8,17 @@
 
 #include <fstream>
 #include <algorithm>
-#include "Monocular_Utils.h"
+#include "M_Utils.h"
 #include "CFuncHelper.h"
-#include "Monocular_CoorTransform.h"
-#include "Monocular_Config.h"
-#include "Monocular_DataLoader.h"
+#include "M_CoorTransform.h"
+#include "M_Config.h"
+#include "M_DataLoader.h"
 #include "CFeatureTrack.h"
 #include "COptimizer.h"
 #include "CFrame.h"
 #include "CMap.h"
 #include "CViewer.h"
-
+#include <thread>
 #include "algorithm"
 
 #include "CDataManager.h"
@@ -142,7 +142,6 @@ void PreprocessData(const std::string &imgpath,
                     const std::string &outpath,
                     const std::string &oimpath)
 {
-
     // assert(!imgpath.empty() && pstpath.empty() && !imupath.empty() && !outpath.empty() && !oimpath.empty());
 
     ofstream pFile, pImu;
@@ -221,54 +220,14 @@ void PreprocessData(const std::string &imgpath,
 // main func
 int main(int argc, const char *argv[])
 {
-    // insert code here...
-
-    // cout << cvtwk2dytime(285481.556158) << endl;
-
-    //PreprocessData(s_imgGray, s_pstpath, s_imupath, s_imgGray + "/pstdatas.txt",
-    //               s_imgGray + "/imudatas.txt");
-
-    if(CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",
-                  s_imgGray + "/imudatas.txt"))
-    {
-        ImgInfoVIter it = CDataManager::getSingleton()->begin();
-        ImgInfoVIter ed = CDataManager::getSingleton()->end();
-
-        int index = 0;
-        cout.precision(20);
-        for(;it != ed; ++it)
-        {
-            cout << it->first.c_str() << endl;
-            cout << it->second.pos.longitude << endl;
-            if(index++ > 100)
-            {
-               IMURawVector datas =  CDataManager::getSingleton()->getIMUDataFromLastTime(it->second._t);
-               cout << datas.begin()->_t << endl;
-               cout << datas.rbegin()->_t << endl;
-               break;
-            }
-            else if(index++ > 50)
-            {
-               IMURawVector datas =  CDataManager::getSingleton()->getIMUDataFromLastTime(it->second._t);
-               cout << datas.begin()->_t << endl;
-               cout << datas.rbegin()->_t << endl;
-            }
-            else
-            {
-                ;
-            }
-            
-        }
-    }
-    
-
-    return 0;
 
     FrameDrawer *pFdrawer = NULL;
     Map *pMap = new Map();
     MapDrawer *pMpDrawer = new MapDrawer(pMap, "config");
     Viewer viewer(pFdrawer, pMpDrawer);
 
+    thread thd(&Viewer::Run,&viewer);
+    thd.detach();
     std::shared_ptr<IConfig> pConfig =
         std::make_shared<WeiYaConfig>(s_excfg, s_bscfg);
 
@@ -359,9 +318,6 @@ int main(int argc, const char *argv[])
         }
 
         Mat E, R, t, mask;
-        // E = findEssentialMat( curFrame->getCurMatchPts(),preFrame->getPreMatchPts(), cam.K,RANSAC,
-        //                      0.999, 1.0, mask);
-        // recoverPose(E,  curFrame->getCurMatchPts(), preFrame->getPreMatchPts(),cam.K,R, t, mask);
 
         E = findEssentialMat(preFrame->getPreMatchPts(), curFrame->getCurMatchPts(), cam.K, RANSAC,
                              0.999, 1.0, mask);
@@ -390,44 +346,19 @@ int main(int argc, const char *argv[])
         }
         else
         {
-            // if((t.at<double>(2) > t.at<double>(0)) &&
-            //    (t.at<double>(2) > t.at<double>(1)))
-            {
-                // t_T = t_T + t_R * t;
-                // t_R = R * t_R;
-
-                t_R = R * t_R;
-                t_T = R * t_T + t;
-                result_t = -t_R.inv() * t_T;
-            }
-            cout << "write " << fname.c_str() << " " << i << endl;
+   
+            t_R = R * t_R;
+            t_T = R * t_T + t;
+            result_t = -t_R.inv() * t_T;
+            
+           // cout << "write " << fname.c_str() << " " << i << endl;
             writeRealTrace(realfile, prepose.pos, fname);
         }
 
         const PtVector &curpts = curFrame->getCurMatchPts();
 
         char ottxt[255] = {0};
-
-        // Mat displayCur = curimg.clone();
-        // sprintf(ottxt, "key count : %d \n matches count : %d",curFrame->getKeys().size(), curFrame->getCurMatchPts().size());
-
-        // putText(displayCur,ottxt,Point2i(300,200), cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255,0,0),3);
-
-        // //draw key points
-        // for(size_t j = 0; j < curFrame->getKeys().size();++j)
-        // {
-        //     circle(displayCur,curFrame->getKeys()[j].pt,6,CV_RGB(0,0,200),3,LINE_AA);
-        // }
-
-        // //draw match points
-        // for(size_t i = 0 ; i < curpts.size(); ++i)
-        // {
-        //     circle(displayCur,curpts[i],6,CV_RGB(0,255,0),3,LINE_AA);
-        //     // const int r = 8;
-        //     // Rect2i rect(curpts[i].x,curpts[i].y,r,r);
-        //     // rectangle(displayCur,rect,CV_RGB(0,255,0));
-        // }
-
+        
         preFrame = curFrame;
         map.push(curFrame);
 
@@ -438,7 +369,7 @@ int main(int argc, const char *argv[])
         //        M_Untils::GetRtFromPose(prepose, curpose, cam.RCam2Imu, cam.TCam2Imu, poseR, poseT);
 
         BLHCoordinate _blh;
-        // M_Untils::CalcPoseFromRT(orignPose, Mat::eye(3, 3, CV_64F), t_T, cam.RCam2Imu, cam.TCam2Imu, _blh);
+
         M_Untils::CalcPoseFromRT(orignPose, Mat::eye(3, 3, CV_64F), result_t, cam.RCam2Imu, cam.TCam2Imu, _blh);
         //计算高斯投影差值
         Point3d realgauss = M_CoorTrans::BLH_to_GaussPrj(curpose.pos);
@@ -448,21 +379,6 @@ int main(int argc, const char *argv[])
 
         writeEstTrace(estfile, _blh, residual, fname);
 
-        // static const int half_size = WIN_SIZE >> 1;
-        // int x = int(t_T.at<double>(0)) + half_size;
-        // int y = int(t_T.at<double>(2)) + 400;
-        // static const int half_size = WIN_SIZE >> 1;
-        // int x = int(result_t.at<double>(0)) + half_size;
-        // int y = int(result_t.at<double>(2)) + 400;
-        // circle(traj, Point(x, y) ,1, CV_RGB(255,0,0), 2);//红色计算轨迹
-        // rectangle( traj, Point(10, 30), Point(550, 50), CV_RGB(0,0,0), CV_FILLED);
-
-        // Mat imgdisplay;
-
-        // resize(curimg,imgdisplay,Size( (WIN_SIZE * 1.5), (WIN_SIZE ) ));
-
-        // imshow("img",imgdisplay);
-        // imshow("display", traj);
         waitKey(1);
 
         //system("free -h");
@@ -470,13 +386,12 @@ int main(int argc, const char *argv[])
         t_R.copyTo(t_t.rowRange(0, 3).colRange(0, 3)); //
 
         t_T.copyTo(t_t.rowRange(0, 3).col(3));
+
         pMpDrawer->SetCurrentCameraPose(t_t);
 
         KeyFrame *kframe = new KeyFrame();
         kframe->SetWorldPos(t_t);
         pMap->push(kframe);
-
-        viewer.Run();
 
         pretime = curtime;
     }

@@ -1,15 +1,15 @@
 ﻿//
 //  DataLoader.hpp
-//  MonocularPositioning
+//  
 //
 //  Created by TuLigen on 2019/6/10.
 //  Copyright © 2019年 TuLigen. All rights reserved.
 //
 
-#ifndef DataLoader_hpp
-#define DataLoader_hpp
+#ifndef _M_DATALOADER_H_H_
+#define _M_DATALOADER_H_H_
 
-#include "Monocular_Types.h"
+#include "M_Types.h"
 
 /*
  *  数据加载类

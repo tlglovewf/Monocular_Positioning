@@ -22,6 +22,11 @@ public:
         return mWorldPosInv;
     }
     
+    cv::Point3f GetWorldCenter()const
+    {
+        return mCenter;
+    }
+
     void SetWorldPos(const cv::Mat &pos)
     {
         mWorldPos = pos.clone();
@@ -34,11 +39,16 @@ public:
         mWorldPosInv = cv::Mat::eye(4,4,pos.type());
         Rwc.copyTo(mWorldPosInv.rowRange(0,3).colRange(0,3));
         Ow.copyTo(mWorldPosInv.rowRange(0,3).col(3));
+
+        mCenter.x = static_cast<float>(Ow.at<double>(0));
+        mCenter.y = static_cast<float>(Ow.at<double>(1));
+        mCenter.z = static_cast<float>(Ow.at<double>(2));
     }
     
 protected:
     cv::Mat mWorldPos;
     cv::Mat mWorldPosInv;
+    cv::Point3f mCenter;
 };
 
 class MapPoint

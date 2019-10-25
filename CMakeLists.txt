@@ -36,16 +36,21 @@ if(NOT OpenCV_FOUND)
    endif()
 endif()
 
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
+find_package(Cholmod REQUIRED)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
 ${PROJECT_SOURCE_DIR}/PosEstimate/include
+${PROJECT_SOURCE_DIR}/PosEstimate
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
-#${PROJECT_SOURCE_DIR}/../ThirdParty/
+${CHOLMOD_INCLUDE_DIR}
+${PROJECT_SOURCE_DIR}/../ThirdParty/
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -62,15 +67,22 @@ PosEstimate/sources/CMapDrawer.cpp
 PosEstimate/sources/CFrameDrawer.cpp
 PosEstimate/sources/CViewer.cpp
 PosEstimate/sources/CDataManager.cpp
-source/Monocular_DataLoader.cpp
-source/Monocular_Config.cpp
-source/Monocular_CoorTransform.cpp
+PosEstimate/IMU/IMUPreintegrator.cpp
+PosEstimate/IMU/imudata.cpp
+PosEstimate/IMU/so3.cpp
+PosEstimate/IMU/g2otypes.cpp
+PosEstimate/IMU/NavState.cpp
+source/M_DataLoader.cpp
+source/M_Config.cpp
+source/M_CoorTransform.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
+cholmod
+${CHOLMOD_LIBRARIES}
 #${PROJECT_SOURCE_DIR}/ThirdParty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/../ThirdParty/g2o/lib/libg2o.so
 )

@@ -6,7 +6,8 @@
 //
 
 #include "CDataManager.h"
-
+#include "CFuncHelper.h"
+#include "M_DataLoader.h"
 CDataManager *CDataManager::getSingleton()
 {
     static CDataManager instance;
@@ -123,12 +124,144 @@ IMURawVector CDataManager::getIMUDataFromLastTime(double cursec)
 
     IMURawVIter iter = std::find_if(mIMURawIndicator,mIMURawDatas.end(),Cmp(cursec));
 
-    cout << iter->_t << endl;
+    // cout << iter->_t << endl;
 
     IMURawVector tmp;
-    tmp.reserve(iter - mIMURawIndicator);
+    size_t sz = iter - mIMURawIndicator;
+    tmp.reserve(sz);
 
-    tmp.assign(mIMURawIndicator,iter);
+    tmp.assign(mIMURawIndicator,iter + 1);
+
+    mIMURawIndicator = iter;
 
     return tmp;
+}
+
+#define FTLEN 25
+#define WRITESPACE(FILE) FILE.width(FTLEN);
+#define WRITEPOSEDATA(FILE, NAME, TIME, LON, LAT, ALT, PITCH, YAW, ROLL) \
+    FILE.width(FTLEN * 2);                                               \
+    FILE << NAME;                                                        \
+    WRITESPACE(FILE)                                                     \
+    FILE << TIME;                                                        \
+    WRITESPACE(FILE)                                                     \
+    FILE << LON;                                                         \
+    WRITESPACE(FILE)                                                     \
+    FILE << LAT;                                                         \
+    WRITESPACE(FILE)                                                     \
+    FILE << ALT;                                                         \
+    WRITESPACE(FILE)                                                     \
+    FILE << PITCH;                                                       \
+    WRITESPACE(FILE)                                                     \
+    FILE << YAW;                                                         \
+    WRITESPACE(FILE)                                                     \
+    FILE << ROLL;                                                        \
+    FILE << endl;
+
+#define WRITEIMURAWDATA(FILE, TIME, GX, GY, GZ, AX, AY, AZ) \
+    WRITESPACE(FILE);                                       \
+    FILE << TIME;                                           \
+    WRITESPACE(FILE);                                       \
+    FILE << GX;                                             \
+    WRITESPACE(FILE);                                       \
+    FILE << GY;                                             \
+    WRITESPACE(FILE);                                       \
+    FILE << GZ;                                             \
+    WRITESPACE(FILE);                                       \
+    FILE << AX;                                             \
+    WRITESPACE(FILE);                                       \
+    FILE << AY;                                             \
+    WRITESPACE(FILE);                                       \
+    FILE << AZ;                                             \
+    FILE << endl;
+
+
+/* 预处理数据
+ * @param imgpath  图片路径
+ * @param pstpath  pst路径
+ * @param imupath  imu路径
+ * @param outpath  输出路径
+ * @param oimpath  imu输出路径
+ */
+void CDataManager::PreprocessData(const std::string &imgpath,
+                                 const std::string &pstpath,
+                                 const std::string &imupath,
+                                 const std::string &outpath,
+                                 const std::string &oimpath,
+                                 PreprocessType type /*= eStim300*/)
+{
+    // assert(!imgpath.empty() && pstpath.empty() && !imupath.empty() && !outpath.empty() && !oimpath.empty());
+
+    ofstream pFile, pImu;
+    pFile.precision(15);
+    pFile.flags(ios::left | ios::fixed);
+
+    pImu.precision(15);
+    pImu.flags(ios::left | ios::fixed);
+
+    try
+    {
+        pFile.open(outpath);
+        pImu.open(oimpath);
+        typedef std::vector<std::string> FileNameVec;
+        FileNameVec fms;
+        int sz = loadFiles(imgpath, fms);
+
+        Ptr<IDataLoader> pPstDataLoader = new Stim300PostTDataLoader();
+        pPstDataLoader->loadData(pstpath);
+
+        Ptr<IMURawDataLoader> pIMUDataloader = new STIM300IMURawDataLoader();
+        pIMUDataloader->loadData(imupath);
+
+        cout << "begin writing datas." << endl;
+        WRITEPOSEDATA(pFile, "Name", "Time", "Lon", "Lat", "Alt", "Pitch", "Yaw", "Roll");
+        WRITEIMURAWDATA(pImu, "Time", "Gyro_x", "Gyro_y", "Gyro_z", "Acc_x", "Acc_y", "Acc_z");
+
+        double bgtime = 0.0;
+        double edtime = 0.0;
+        for (int i = 0; i < sz; ++i)
+        {
+            const std::string &imgname = fms[i].substr(fms[i].length() - 38);
+            const double imgtime = M_Untils::GetDayTimeFromPicName(imgname);
+
+            const PoseData posedata = pPstDataLoader->getData(imgtime);
+
+            WRITEPOSEDATA(pFile, imgname, posedata._t,
+                          posedata.pos.longitude,
+                          posedata.pos.latitude,
+                          posedata.pos.altitude,
+                          posedata._pitch,
+                          posedata._yaw,
+                          posedata._roll);
+
+            if (i > 0)
+            {//from second frame
+                edtime = imgtime;
+                IMURawVector rawdatas(pIMUDataloader->getDatas(bgtime, edtime));
+                const int sti = (i == 1) ? 0 : 1;
+                for (size_t i = sti; i < rawdatas.size(); ++i)
+                {
+                    WRITEIMURAWDATA(pImu, rawdatas[i]._t,
+                                    rawdatas[i]._gyro_x,
+                                    rawdatas[i]._gyro_y,
+                                    rawdatas[i]._gyro_z,
+                                    rawdatas[i]._acc_x,
+                                    rawdatas[i]._acc_y,
+                                    rawdatas[i]._acc_z);
+                }
+                bgtime = edtime;
+            }
+            else
+            {
+                bgtime = imgtime;
+            }
+        }
+        pFile.close();
+        pImu.close();
+        cout << "write successfully!!!" << endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }

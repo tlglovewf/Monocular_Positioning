@@ -8,7 +8,7 @@
 #define _DATA_MANAGER_H_H_
 
 #include <string>
-#include "Monocular_Utils.h"
+#include "M_Utils.h"
 using namespace std;
 
 typedef std::vector<std::pair<std::string, PoseData>> ImgInfoVector;
@@ -19,7 +19,11 @@ typedef ImgInfoVector::iterator ImgInfoVIter;
 class CDataManager
 {
 public:
-    enum PreprocessType{ eStim300 };
+    enum PreprocessType
+    {
+        eStim300
+    };
+
 public:
     /*
      * 单例
@@ -33,17 +37,23 @@ public:
      */
     bool LoadData(const string &pstpath, const string &imupath);
 
-    /*
-     * 数据处理
-     */
-    void ProcessData(PreprocessType type = eStim300)
-    {
-        //add more...
-    }
+    /* 预处理数据
+ * @param imgpath  图片路径
+ * @param pstpath  pst路径
+ * @param imupath  imu路径
+ * @param outpath  输出路径
+ * @param oimpath  imu输出路径
+ */
+    void PreprocessData(const std::string &imgpath,
+                        const std::string &pstpath,
+                        const std::string &imupath,
+                        const std::string &outpath,
+                        const std::string &oimpath,
+                        PreprocessType type = eStim300);
 
-    /* 获取imgpst 容器头
+        /* 获取imgpst 容器头
     */
-    ImgInfoVIter begin()
+        ImgInfoVIter begin()
     {
         return mPoseDatas.begin();
     }
@@ -60,17 +70,18 @@ public:
      * @return 数据集
      */
     IMURawVector getIMUDataFromLastTime(double cursec);
-protected:
-    //单例　外部禁用拷贝复制
-    CDataManager(){}
-    CDataManager(const CDataManager&){}
 
 protected:
-    IMURawVector  mIMURawDatas;
+    //单例　外部禁用拷贝复制
+    CDataManager() {}
+    CDataManager(const CDataManager &) {}
+
+protected:
+    IMURawVector mIMURawDatas;
     ImgInfoVector mPoseDatas;
 
     //imu数据量太大  设置游标 提升访问效率
-    IMURawVIter   mIMURawIndicator;
+    IMURawVIter mIMURawIndicator;
 };
 
 #endif

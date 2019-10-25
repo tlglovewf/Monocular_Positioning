@@ -1,8 +1,16 @@
-﻿#ifndef _COORDINATETRANSFORM_H_
-#define _COORDINATETRANSFORM_H_
+﻿//
+//  CoorTransform.hpp
+//  
+//
+//  Created by TuLigen on 2019/6/10.
+//  Copyright © 2019年 TuLigen. All rights reserved.
+//
+
+#ifndef _M_COORTRANSFORM_H_H_
+#define _M_COORTRANSFORM_H_H_
 
 #include <opencv2/core.hpp>
-#include "Monocular_Types.h"
+#include "M_Types.h"
 using namespace cv;
 #define D2R(X)   (X) * 0.01745329251994329547437168059786927187815308570862
 #define R2D(X)   (X) / 0.01745329251994329547437168059786927187815308570862

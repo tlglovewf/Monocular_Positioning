@@ -1,11 +1,11 @@
-#include "Monocular_Config.h"
+#include "M_Config.h"
 
 /*
-* 读取配置
+* 锟斤拷取锟斤拷锟斤拷
 */
 bool WeiYaConfig::ReadConfig(Camera &cam)
 {
-	//参数文件有一个为空则返回
+	//锟斤拷锟斤拷锟侥硷拷锟斤拷一锟斤拷为锟斤拷锟津返伙拷
 	if (mIntrinsics.empty() || mBs.empty())
 	{
 		cout << "Config file error >>>>>>>>>>>>>" << endl;

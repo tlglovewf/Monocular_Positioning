@@ -5,34 +5,14 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 using namespace std;
-Viewer::Viewer(FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer):mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer),
-    mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false)
+Viewer::Viewer(FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer) : mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer),
+                                                                   mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false)
 {
-//    cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
-//
-//    float fps = fSettings["Camera.fps"];
-//    if(fps<1)
-//        fps=30;
-//    mT = 1e3/fps;
-//
-//    mImageWidth = fSettings["Camera.width"];
-//    mImageHeight = fSettings["Camera.height"];
-//    if(mImageWidth<1 || mImageHeight<1)
-//    {
-//        mImageWidth = 640;
-//        mImageHeight = 480;
-//    }
-//
-//    mViewpointX = fSettings["Viewer.ViewpointX"];
-//    mViewpointY = fSettings["Viewer.ViewpointY"];
-//    mViewpointZ = fSettings["Viewer.ViewpointZ"];
-//    mViewpointF = fSettings["Viewer.ViewpointF"];
-    
-    mT = 1e3 / 10.0;
-    mViewpointX = -1.0;
-    mViewpointY = 0.0;
-    mViewpointZ = 0.0;
-    mViewpointF = 1;
+    mT          = 1e3 / 10.0;
+    mViewpointX = 0;
+    mViewpointY = -10;
+    mViewpointZ = -0.1;
+    mViewpointF = 400;
 }
 
 void Viewer::Run()
@@ -42,90 +22,87 @@ void Viewer::Run()
 
     static bool init = false;
     pangolin::OpenGlMatrix Twc;
-    
-    if(!init)
-    {
-        pangolin::CreateWindowAndBind("ORB-SLAM2: Map Viewer",1024,768);
-        
+
+    // if (!init)
+    // {
+        pangolin::CreateWindowAndBind("ORB-SLAM2: Map Viewer", 1024, 768);
+
         // 3D Mouse handler requires depth testing to be enabled
         glEnable(GL_DEPTH_TEST);
-        
+
         // Issue specific OpenGl we might need
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
-    pangolin::CreatePanel("menu").SetBounds(0.0,1.0,0.0,pangolin::Attach::Pix(175));
-       
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        pangolin::CreatePanel("menu").SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(175));
 
         // Add named OpenGL viewport to window and provide 3D Handler
-       
-        
-        
+
         Twc.SetIdentity();
-        
-        cv::namedWindow("ORB-SLAM2: Current Frame");
-        init = true;
-    }
-    
-    static pangolin::Var<bool> menuFollowCamera("menu.Follow Camera",true,true);
-    static pangolin::Var<bool> menuShowPoints("menu.Show Points",true,true);
-    static pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames",true,true);
-    static pangolin::Var<bool> menuShowGraph("menu.Show Graph",true,true);
-    static pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode",false,true);
-    static pangolin::Var<bool> menuReset("menu.Reset",false,false);
-    // Define Camera Render Object (for view / scene browsing)
-    static pangolin::OpenGlRenderState s_cam(
-                                      pangolin::ProjectionMatrix(1024,768,mViewpointF,mViewpointF,512,389,0.1,1000),
-                                      pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,1.0, 1.0)
-                                      );
-    static pangolin::View& d_cam = pangolin::CreateDisplay()
-    .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1024.0f/768.0f)
-    .SetHandler(new pangolin::Handler3D(s_cam));
-    
+
+        static pangolin::Var<bool> menuFollowCamera("menu.Follow Camera", true, true);
+        static pangolin::Var<bool> menuShowPoints("menu.Show Points", true, true);
+        static pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames", true, true);
+        static pangolin::Var<bool> menuShowGraph("menu.Show Graph", true, true);
+        static pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode", false, true);
+        static pangolin::Var<bool> menuReset("menu.Reset", false, false);
+        // Define Camera Render Object (for view / scene browsing)
+        pangolin::OpenGlRenderState s_cam(
+            pangolin::ProjectionMatrix(1024, 768, mViewpointF, mViewpointF, 512, 389, 0.1, 1000),
+            pangolin::ModelViewLookAt(mViewpointX, mViewpointY, mViewpointZ, 0, 0, 0, 0.0, -1.0, 0.0));
+
+        // Add named OpenGL viewport to window and provide 3D Handler
+        pangolin::View &d_cam = pangolin::CreateDisplay()
+                                    .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1024.0f / 768.0f)
+                                    .SetHandler(new pangolin::Handler3D(s_cam));
+
+        // cv::namedWindow("ORB-SLAM2: Current Frame");
+    //     init = true;
+    // }
+
     bool bFollow = true;
     bool bLocalizationMode = false;
 
-//    while(1)
+    while (1)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mpMapDrawer->GetCurrentOpenGLCameraMatrix(Twc);
 
-    
-       if(menuFollowCamera && bFollow)
-       {
-           s_cam.Follow(Twc);
-       }
-       else if(menuFollowCamera && !bFollow)
-       {
-           s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0));
-           s_cam.Follow(Twc);
-           bFollow = true;
-       }
-       else if(!menuFollowCamera && bFollow)
-       {
-           bFollow = false;
-       }
+        if (menuFollowCamera && bFollow)
+        {
+            s_cam.Follow(Twc);
+        }
+        else if (menuFollowCamera && !bFollow)
+        {
+            s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX, mViewpointY, mViewpointZ, 0, 0, 0, 0.0, -1.0, 0.0));
+            s_cam.Follow(Twc);
+            bFollow = true;
+        }
+        else if (!menuFollowCamera && bFollow)
+        {
+            bFollow = false;
+        }
 
         d_cam.Activate(s_cam);
-        glClearColor(1.0f,1.0f,1.0f,1.0f);
-        
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
         mpMapDrawer->DrawCurrentCamera(Twc);
-//        if(menuShowKeyFrames || menuShowGraph)
-            mpMapDrawer->DrawKeyFrames(menuShowKeyFrames,menuShowGraph);
-        if(menuShowPoints)
-            mpMapDrawer->DrawMapPoints();
+        if (menuShowKeyFrames || menuShowGraph)
+            mpMapDrawer->DrawKeyFrames(menuShowKeyFrames, menuShowGraph);
+        // if(menuShowPoints)
+        // mpMapDrawer->DrawMapPoints();
 
         pangolin::FinishFrame();
 
-//        cv::Mat im = mpFrameDrawer->DrawFrame();
-        
-//        cv::Mat o_im;
-//        cv::resize(im, o_im, cv::Size(im.cols/2.0,im.rows/2.0));
-//        cv::imshow("ORB-SLAM2: Current Frame",o_im);
-//        cv::waitKey(mT);
+        //        cv::Mat im = mpFrameDrawer->DrawFrame();
 
-        if(menuReset)
+        //        cv::Mat o_im;
+        //        cv::resize(im, o_im, cv::Size(im.cols/2.0,im.rows/2.0));
+        //        cv::imshow("ORB-SLAM2: Current Frame",o_im);
+        //        cv::waitKey(mT);
+
+        if (menuReset)
         {
             menuShowGraph = true;
             menuShowKeyFrames = true;
@@ -137,16 +114,16 @@ void Viewer::Run()
             menuReset = false;
         }
 
-//        if(Stop())
-//        {
-//            while(isStopped())
-//            {
-//                usleep(3000);
-//            }
-//        }
+        //        if(Stop())
+        //        {
+        //            while(isStopped())
+        //            {
+        //                usleep(3000);
+        //            }
+        //        }
 
-//        if(CheckFinish())
-//            break;
+        //        if(CheckFinish())
+        //            break;
     }
 
     SetFinish();
@@ -179,7 +156,7 @@ bool Viewer::isFinished()
 void Viewer::RequestStop()
 {
     unique_lock<mutex> lock(mMutexStop);
-    if(!mbStopped)
+    if (!mbStopped)
         mbStopRequested = true;
 }
 
@@ -194,9 +171,9 @@ bool Viewer::Stop()
     unique_lock<mutex> lock(mMutexStop);
     unique_lock<mutex> lock2(mMutexFinish);
 
-    if(mbFinishRequested)
+    if (mbFinishRequested)
         return false;
-    else if(mbStopRequested)
+    else if (mbStopRequested)
     {
         mbStopped = true;
         mbStopRequested = false;
@@ -204,7 +181,6 @@ bool Viewer::Stop()
     }
 
     return false;
-
 }
 
 void Viewer::Release()

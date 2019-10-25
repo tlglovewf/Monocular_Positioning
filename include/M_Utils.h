@@ -1,16 +1,15 @@
 //
-//  Monocular_Utils.h
-//  MonocularPositioning
+//  M_Utils.h
 //
 //  Created by TuLigen on 2019/6/4.
 //  Copyright © 2019年 TuLigen. All rights reserved.
 //
 
-#ifndef Monocular_Utils_h
-#define Monocular_Utils_h
+#ifndef _M_UTILS_H_H_
+#define _M_UTILS_H_H_
 
-#include "Monocular_Types.h"
-#include "Monocular_CoorTransform.h"
+#include "M_Types.h"
+#include "M_CoorTransform.h"
 #include <ctime>
 #define GPS_LEAP_TIME     18.0   //GPS 闰秒
 //工具类

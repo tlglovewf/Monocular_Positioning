@@ -1,13 +1,12 @@
 ﻿//
-//  Monocular_Types.h
-//  MonocularPositioning
+//  Ｍ_Types.h
 //
 //  Created by TuLigen on 2019/6/4.
 //  Copyright © 2019年 TuLigen. All rights reserved.
 //
 
-#ifndef Monocular_Types_h
-#define Monocular_Types_h
+#ifndef _M_TYPES_H_H_
+#define _M_TYPES_H_H_
 
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
