@@ -23,6 +23,8 @@
 
 #include "CDataManager.h"
 
+#include "IMU/IMUPreintegrator.h"
+
 using namespace cv;
 using namespace std;
 
@@ -221,6 +223,10 @@ void PreprocessData(const std::string &imgpath,
 int main(int argc, const char *argv[])
 {
 
+    ORB_SLAM2::IMUPreintegrator imupre;
+
+    CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",s_imgGray + "/imudatas.txt");
+
     FrameDrawer *pFdrawer = NULL;
     Map *pMap = new Map();
     MapDrawer *pMpDrawer = new MapDrawer(pMap, "config");
@@ -233,11 +239,6 @@ int main(int argc, const char *argv[])
 
     Camera cam;
     pConfig->ReadConfig(cam);
-    unique_ptr<IDataLoader> pData = std::make_unique<Stim300PostTDataLoader>();
-
-    FileNameVec flnms;
-    loadFiles(s_imgGray, flnms);
-    pData->loadData(s_pstpath);
 
     // Ptr<IFeatureTrack> track = new CVFeatureTrack();
 
@@ -248,16 +249,19 @@ int main(int argc, const char *argv[])
     CMap map;
 
     const int bg_no = s_stNo;
-    Mat preimg = imread(flnms[bg_no], CV_LOAD_IMAGE_UNCHANGED);
 
-    printf("%d-%d\n", preimg.channels(), preimg.type());
+    ImgInfoVIter bgIter = CDataManager::getSingleton()->begin() + bg_no;
+    ImgInfoVIter edIter = CDataManager::getSingleton()->end();
+
+    Mat preimg = imread(s_imgGray + bgIter->first , CV_LOAD_IMAGE_UNCHANGED);
+
     preFrame->setImage(preimg);
 
     track->calcFeatures(preimg, preFrame);
 
     preFrame->initStaticParams();
 
-    double pretime = M_Untils::GetDayTimeFromPicName(flnms[bg_no]);
+    double pretime = M_Untils::GetDayTimeFromPicName(bgIter->first);
 
     cout.precision(15);
 
@@ -279,12 +283,9 @@ int main(int argc, const char *argv[])
     Mat traj = Mat::zeros(WIN_SIZE, WIN_SIZE, CV_8UC3);
 
     // map.push(preFrame);
-    for (size_t i = bg_no + 1; i < flnms.size(); ++i)
+    for ( ++bgIter; bgIter != edIter; ++bgIter)
     {
-        size_t n = flnms[i].find_last_of('-');
-        const string fname = flnms[i].substr(++n);
-
-        Mat curimg = imread(flnms[i], CV_LOAD_IMAGE_UNCHANGED);
+        Mat curimg = imread(s_imgGray + bgIter->first, CV_LOAD_IMAGE_UNCHANGED);
         curFrame = new Frame;
         curFrame->setImage(curimg);
 
@@ -295,23 +296,9 @@ int main(int argc, const char *argv[])
 
         track->match(preFrame, curFrame, mt);
 
-        if (i % 500 == 0)
-        {
-            drawMatches(preFrame->getImage(), preFrame->getKeys(), curFrame->getImage(), curFrame->getKeys(), mt, matchimg);
-
-            char matchtxt[255] = {0};
-            sprintf(matchtxt, "key count : %d \n matches count : %d", curFrame->getKeys().size(), curFrame->getCurMatchPts().size());
-
-            putText(matchimg, matchtxt, Point2i(300, 200), cv::FONT_HERSHEY_SIMPLEX, 1, CV_RGB(255, 0, 0), 3);
-
-            sprintf(matchtxt, "%s/matches_%d.png", "/media/navinfo/Bak", i);
-
-            imwrite(matchtxt, matchimg);
-        }
-
         if (curFrame->getCurMatchPts().size() < 10)
         {
-            printf("there has no rigt data for next step...  %d \n", i);
+            printf("there has no rigt data for next step...  %s \n", bgIter->first.c_str());
             preFrame = curFrame;
             curFrame = NULL;
             continue;
@@ -330,19 +317,21 @@ int main(int argc, const char *argv[])
 
         t = t * ln;
 
-        PoseData prepose = pData->getData(pretime);
-        double curtime = M_Untils::GetDayTimeFromPicName(flnms[i]);
-        PoseData curpose = pData->getData(curtime);
+        PoseData prepose = (bgIter - 1)->second;
+        double curtime = M_Untils::GetDayTimeFromPicName(s_imgGray + bgIter->first);
+        PoseData curpose = bgIter->second;
 
         Mat result_t;
-        if (bg_no + 1 == i)
+        static bool bol = false;
+        if (!bol)
         {
-            writeRealTrace(realfile, prepose.pos, fname);
+            writeRealTrace(realfile, prepose.pos, bgIter->first);
             orignPose = prepose;
             t_R = R.clone();
             t_T = t.clone();
 
             result_t = -R.inv() * t_T;
+            bol = true;
         }
         else
         {
@@ -351,8 +340,7 @@ int main(int argc, const char *argv[])
             t_T = R * t_T + t;
             result_t = -t_R.inv() * t_T;
             
-           // cout << "write " << fname.c_str() << " " << i << endl;
-            writeRealTrace(realfile, prepose.pos, fname);
+            writeRealTrace(realfile, prepose.pos, bgIter->first);
         }
 
         const PtVector &curpts = curFrame->getCurMatchPts();
@@ -377,7 +365,7 @@ int main(int argc, const char *argv[])
 
         Point3d residual = estgauss - realgauss;
 
-        writeEstTrace(estfile, _blh, residual, fname);
+        writeEstTrace(estfile, _blh, residual, bgIter->first);
 
         waitKey(1);
 
