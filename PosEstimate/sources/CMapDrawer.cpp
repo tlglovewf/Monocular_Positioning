@@ -7,9 +7,27 @@ MapDrawer::MapDrawer(Map *pMap, const string &strSettingPath) : mpMap(pMap)
     mKeyFrameSize = 0.5;
     mKeyFrameLineWidth = 1;
     mGraphLineWidth = 2;
-    mPointSize = 2;
+    mPointSize = 5;
     mCameraSize = 0.8;
     mCameraLineWidth = 8;
+}
+
+void MapDrawer::DrawIMUPose()
+{
+    const std::vector<Eigen::Vector3d> &imudatas = mpMap->getIMUPose();
+   
+    glPointSize(mPointSize);
+    glBegin(GL_POINTS);
+    glColor3f(1.0,0.0,0.0);
+    
+    for(size_t i = 0;i < imudatas.size(); ++i)
+    {
+        glVertex3f(static_cast<float>(imudatas[i].x()),
+                   static_cast<float>(imudatas[i].y()),
+                   static_cast<float>(imudatas[i].z()));
+    }
+    glEnd();
+
 }
 
 void MapDrawer::DrawMapPoints()

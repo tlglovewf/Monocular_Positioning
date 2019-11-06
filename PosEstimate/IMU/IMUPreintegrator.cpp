@@ -35,6 +35,10 @@ IMUPreintegrator::IMUPreintegrator()
     // noise covariance propagation of delta measurements
     _cov_P_V_Phi.setZero();
 
+
+    _acc_0.setZero();
+    _gyr_0.setZero();
+    _tmp_Q.setIdentity();
     _delta_time = 0;
 }
 
@@ -58,6 +62,36 @@ void IMUPreintegrator::reset()
     _delta_time = 0;
 
 }
+static Eigen::Quaterniond deltaQ(const Eigen::Vector3d &theta)
+    {
+        Eigen::Quaterniond dq;
+        Eigen::Vector3d half_theta = theta;
+        half_theta /= static_cast<double>(2.0);
+        dq.w() = static_cast<double>(1.0);
+        dq.x() = half_theta.x();
+        dq.y() = half_theta.y();
+        dq.z() = half_theta.z();
+        return dq;
+    }
+#define Gravity Vector3d(0,0,9.8)
+void IMUPreintegrator::predict(const Vector3d &acc, const Vector3d &gyr, double dt)
+{
+    Eigen::Vector3d un_acc_0 = _tmp_Q * (_acc_0);// - tmp_Ba) - ;
+
+    Eigen::Vector3d un_gyr = 0.5 * (_gyr_0 + gyr);// - tmp_Bg;
+    _tmp_Q = _tmp_Q * deltaQ(un_gyr * dt);
+
+    Eigen::Vector3d un_acc_1 = _tmp_Q * (acc) - Gravity;
+
+    Eigen::Vector3d un_acc = 0.5 * (un_acc_0 + un_acc_1);
+
+    _delta_P = _delta_P + dt * _delta_V + 0.5 * dt * dt * un_acc;
+    _delta_V = _delta_V + dt * un_acc;
+
+    _acc_0 = acc;
+    _gyr_0 = gyr;
+}
+
 
 // incrementally update 1)delta measurements, 2)jacobians, 3)covariance matrix
 // acc: acc_measurement - bias_a, last measurement!! not current measurement
@@ -97,8 +131,8 @@ void IMUPreintegrator::update(const Vector3d& omega, const Vector3d& acc, const 
 
     // delta measurements, position/velocity/rotation(matrix)
     // update P first, then V, then R. because P's update need V&R's previous state
-    _delta_P += _delta_V*dt + 0.5*_delta_R*acc*dt2;    // P_k+1 = P_k + V_k*dt + R_k*a_k*dt*dt/2
-    _delta_V += _delta_R*acc*dt;
+    _delta_P += _delta_V*dt + 0.5 * _delta_R * acc * dt2;    // P_k+1 = P_k + V_k*dt + R_k*a_k*dt*dt/2
+    _delta_V += _delta_R*acc * dt;
     _delta_R = normalizeRotationM(_delta_R*dR);  // normalize rotation, in case of numerical error accumulation
 
 

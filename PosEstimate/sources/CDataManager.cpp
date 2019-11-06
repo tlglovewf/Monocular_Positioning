@@ -23,6 +23,7 @@ bool CDataManager::LoadData(const string &pstpath, const string &imupath)
 {
     if (pstpath.empty() || imupath.empty())
     {
+        cout << "data file path is error ~" << endl;
         return false;
     }
     else
@@ -130,11 +131,19 @@ IMURawVector CDataManager::getIMUDataFromLastTime(double cursec)
     size_t sz = iter - mIMURawIndicator;
     tmp.reserve(sz);
 
-    tmp.assign(mIMURawIndicator,iter + 1);
+    // tmp.assign(mIMURawIndicator + 1,iter + 1);
+    tmp.assign(mIMURawIndicator,iter);
 
     mIMURawIndicator = iter;
 
     return tmp;
+}
+
+void CDataManager::setIndicator(int index)
+{
+    assert(index < mPoseDatas.size());
+    mIMURawIndicator = std::find_if(mIMURawIndicator,mIMURawDatas.end(),Cmp(mPoseDatas[index].second._t));
+    cout << "indicator : " << mIMURawIndicator->_t << endl;
 }
 
 #define FTLEN 25

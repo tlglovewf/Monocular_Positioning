@@ -50,7 +50,7 @@ const string s_bscfg = s_imgRoot + "0001-1220.bs";
 const string s_pstpath = s_imgRoot + "/1002-0001-190828-00.PosT";
 const string s_imupath = s_imgRoot + "/imu190828_071742.txt";
 const float s_ImgDis = 1.0;
-const int s_stNo = 640; //2140;
+const int s_stNo =  0; //640; //2140;
 #endif
 
 const string s_o_rel = "/media/navinfo/Bak/CPP/QT/real.txt";
@@ -233,13 +233,14 @@ int main(int argc, const char *argv[])
     Viewer viewer(pFdrawer, pMpDrawer);
 
     thread thd(&Viewer::Run,&viewer);
-    thd.detach();
+    
     std::shared_ptr<IConfig> pConfig =
         std::make_shared<WeiYaConfig>(s_excfg, s_bscfg);
 
     Camera cam;
     pConfig->ReadConfig(cam);
 
+    //cv track method
     // Ptr<IFeatureTrack> track = new CVFeatureTrack();
 
     Ptr<IFeatureTrack> track = new ORBFeatureTrack();
@@ -282,9 +283,40 @@ int main(int argc, const char *argv[])
 #define WIN_SIZE 1000
     Mat traj = Mat::zeros(WIN_SIZE, WIN_SIZE, CV_8UC3);
 
-    // map.push(preFrame);
+    CDataManager::getSingleton()->setIndicator(bg_no);
+    Eigen::Vector3d total(0,0,0);
+    int index = 0;
     for ( ++bgIter; bgIter != edIter; ++bgIter)
     {
+        ++index;
+        IMURawVector imudatas = CDataManager::getSingleton()->getIMUDataFromLastTime(bgIter->second._t);
+        cout << "imu data size : " << imudatas.size() << endl;
+        double last_t ;//= (bgIter - 1)->second._t;
+
+        for(size_t i = 0; i < imudatas.size(); ++i)
+        {
+            if( i == imudatas.size() - 1)
+            {
+                last_t = bgIter->second._t;
+            }
+            else
+            {
+                last_t = imudatas[i + 1]._t;
+            }
+
+            Eigen::Vector3d gyro(imudatas[i]._gyro_x,imudatas[i]._gyro_y,imudatas[i]._gyro_z);
+            Eigen::Vector3d acc(imudatas[i]._acc_x,imudatas[i]._acc_y,imudatas[i]._acc_z);
+            total += acc - Eigen::Vector3d(0,1.0,9.8);
+            if(acc.y() < 0)
+            {
+                cout << "total " << total << endl;
+            }
+        
+            double dt = last_t - imudatas[i]._t;
+            // imupre.update(gyro, acc, dt);
+            imupre.predict(acc,gyro,dt);
+        }
+        // cout <<  "Velocity : " << (total) / index << endl;
         Mat curimg = imread(s_imgGray + bgIter->first, CV_LOAD_IMAGE_UNCHANGED);
         curFrame = new Frame;
         curFrame->setImage(curimg);
@@ -325,13 +357,11 @@ int main(int argc, const char *argv[])
         static bool bol = false;
         if (!bol)
         {
-            writeRealTrace(realfile, prepose.pos, bgIter->first);
             orignPose = prepose;
             t_R = R.clone();
             t_T = t.clone();
 
             result_t = -R.inv() * t_T;
-            bol = true;
         }
         else
         {
@@ -339,10 +369,9 @@ int main(int argc, const char *argv[])
             t_R = R * t_R;
             t_T = R * t_T + t;
             result_t = -t_R.inv() * t_T;
-            
-            writeRealTrace(realfile, prepose.pos, bgIter->first);
-        }
 
+        }
+        writeRealTrace(realfile, prepose.pos, bgIter->first);
         const PtVector &curpts = curFrame->getCurMatchPts();
 
         char ottxt[255] = {0};
@@ -351,10 +380,6 @@ int main(int argc, const char *argv[])
         map.push(curFrame);
 
         curFrame = NULL;
-
-        //        Mat poseR;
-        //        Mat poseT;
-        //        M_Untils::GetRtFromPose(prepose, curpose, cam.RCam2Imu, cam.TCam2Imu, poseR, poseT);
 
         BLHCoordinate _blh;
 
@@ -367,8 +392,6 @@ int main(int argc, const char *argv[])
 
         writeEstTrace(estfile, _blh, residual, bgIter->first);
 
-        waitKey(1);
-
         //system("free -h");
         Mat t_t = Mat::eye(4, 4, CV_64F);
         t_R.copyTo(t_t.rowRange(0, 3).colRange(0, 3)); //
@@ -380,8 +403,16 @@ int main(int argc, const char *argv[])
         KeyFrame *kframe = new KeyFrame();
         kframe->SetWorldPos(t_t);
         pMap->push(kframe);
+        // cout << "imu pre pose : " << imupre.getDeltaP() << endl;
+        // cout << "v   get pose : " << result_t << endl;
+        pMap->insertIMUPose(imupre.getDeltaP());
 
         pretime = curtime;
+        if(!bol)
+        {
+            thd.detach();
+            bol = true;
+        }
     }
 
     getchar();

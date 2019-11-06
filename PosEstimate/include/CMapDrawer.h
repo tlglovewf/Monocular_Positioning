@@ -5,7 +5,8 @@
 #include <vector>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
-#include<mutex>
+#include <mutex>
+#include <Eigen/Dense>
 
 
 class KeyFrame
@@ -98,9 +99,20 @@ public:
     {
         mKeyFrames.emplace_back(keyframe);
     }
+
+    void insertIMUPose(const Eigen::Vector3d &imu)
+    {
+        mImuPos.emplace_back(imu);
+    }
+
+    std::vector<Eigen::Vector3d> getIMUPose()const
+    {
+        return mImuPos;
+    }
 protected:
     std::vector<MapPoint*> mMpPoints;
     std::vector<KeyFrame*> mKeyFrames;
+    std::vector<Eigen::Vector3d> mImuPos;
 };
 
 class MapDrawer
@@ -116,6 +128,7 @@ public:
     void SetCurrentCameraPose(const cv::Mat &Tcw);
     void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
 
+    void DrawIMUPose();
 private:
 
     float mKeyFrameSize;

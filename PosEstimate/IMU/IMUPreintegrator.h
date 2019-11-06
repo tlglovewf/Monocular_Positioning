@@ -176,6 +176,8 @@ public:
         Quaterniond qr(R);
         return normalizeRotationQ(qr).toRotationMatrix();
     }
+
+    void predict(const Vector3d &acc, const Vector3d &gyr, double dt);
 private:
     /*
      * NOTE:
@@ -187,7 +189,9 @@ private:
     Eigen::Vector3d _delta_P;    // P_k+1 = P_k + V_k*dt + R_k*a_k*dt*dt/2
     Eigen::Vector3d _delta_V;    // V_k+1 = V_k + R_k*a_k*dt
     Eigen::Matrix3d _delta_R;    // R_k+1 = R_k*exp(w_k*dt).     note: Rwc, Rwc'=Rwc*[w_body]x
-
+    Eigen::Vector3d _acc_0;
+    Eigen::Vector3d _gyr_0;
+    Eigen::Quaterniond _tmp_Q;
     // jacobian of delta measurements w.r.t bias of gyro/acc
     Eigen::Matrix3d _J_P_Biasg;     // position / gyro
     Eigen::Matrix3d _J_P_Biasa;     // position / acc

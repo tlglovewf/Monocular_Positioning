@@ -71,6 +71,10 @@ public:
      */
     IMURawVector getIMUDataFromLastTime(double cursec);
 
+    /* 设置游标位置
+    *
+    */
+    void setIndicator(int index);
 protected:
     //单例　外部禁用拷贝复制
     CDataManager() {}
