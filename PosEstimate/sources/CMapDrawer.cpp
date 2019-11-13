@@ -15,19 +15,18 @@ MapDrawer::MapDrawer(Map *pMap, const string &strSettingPath) : mpMap(pMap)
 void MapDrawer::DrawIMUPose()
 {
     const std::vector<Eigen::Vector3d> &imudatas = mpMap->getIMUPose();
-   
+
     glPointSize(mPointSize);
     glBegin(GL_POINTS);
-    glColor3f(1.0,0.0,0.0);
-    
-    for(size_t i = 0;i < imudatas.size(); ++i)
+    glColor3f(1.0, 0.0, 0.0);
+
+    for (size_t i = 0; i < imudatas.size(); ++i)
     {
         glVertex3f(static_cast<float>(imudatas[i].x()),
                    static_cast<float>(imudatas[i].y()),
                    static_cast<float>(imudatas[i].z()));
     }
     glEnd();
-
 }
 
 void MapDrawer::DrawMapPoints()
@@ -77,6 +76,27 @@ void MapDrawer::DrawMapPoints()
     //    }
 
     //    glEnd();
+}
+
+void MapDrawer::DrawRealKeyFrames()
+{
+    const vector<KeyFrame *> vpKFs = mpMap->GetAllRealKeyFrames();
+    glLineWidth(mGraphLineWidth);
+    glColor4f(0.0f, 0.0f, 1.0f, 0.6f);
+    glBegin(GL_LINES);
+
+    for (size_t i = 1; i < vpKFs.size(); i++)
+    {
+        KeyFrame *pPreKF = vpKFs[i - 1];
+        KeyFrame *pCurKF = vpKFs[i];
+
+        cv::Point3f prept(pPreKF->GetWorldCenter());
+        glVertex3f(prept.x, prept.y, prept.z);
+        cv::Point3f curpt(pCurKF->GetWorldCenter());
+        glVertex3f(curpt.x, curpt.y, curpt.z);
+    }
+
+    glEnd();
 }
 
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
@@ -138,10 +158,9 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
             KeyFrame *pCurKF = vpKFs[i];
 
             cv::Point3f prept(pPreKF->GetWorldCenter());
-            glVertex3f(prept.x,prept.y,prept.z);
+            glVertex3f(prept.x, prept.y, prept.z);
             cv::Point3f curpt(pCurKF->GetWorldCenter());
             glVertex3f(curpt.x, curpt.y, curpt.z);
-
         }
 
         glEnd();

@@ -69,6 +69,7 @@ struct PoseData {
     double _pitch;      //俯仰角
     double _roll;       //翻滚角
     double _yaw;        //航偏角
+    double _v;          //速度
 };
 
 //imu 六轴数据

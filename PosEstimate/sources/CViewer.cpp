@@ -88,8 +88,11 @@ void Viewer::Run()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         mpMapDrawer->DrawCurrentCamera(Twc);
+        mpMapDrawer->DrawRealKeyFrames();
         if (menuShowKeyFrames || menuShowGraph)
             mpMapDrawer->DrawKeyFrames(menuShowKeyFrames, menuShowGraph);
+
+        
         // if(menuShowPoints)
         // mpMapDrawer->DrawMapPoints();
         mpMapDrawer->DrawIMUPose();

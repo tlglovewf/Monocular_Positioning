@@ -50,7 +50,7 @@ const string s_bscfg = s_imgRoot + "0001-1220.bs";
 const string s_pstpath = s_imgRoot + "/1002-0001-190828-00.PosT";
 const string s_imupath = s_imgRoot + "/imu190828_071742.txt";
 const float s_ImgDis = 1.0;
-const int s_stNo =  0; //640; //2140;
+const int s_stNo = 640; //2140;
 #endif
 
 const string s_o_rel = "/media/navinfo/Bak/CPP/QT/real.txt";
@@ -95,7 +95,7 @@ void conver2Gray(const std::string &inputpath, const std::string &outpath)
 
 #define FTLEN 25
 #define WRITESPACE(FILE) FILE.width(FTLEN);
-#define WRITEPOSEDATA(FILE, NAME, TIME, LON, LAT, ALT, PITCH, YAW, ROLL) \
+#define WRITEPOSEDATA(FILE, NAME, TIME, LON, LAT, ALT, PITCH, YAW, ROLL, V) \
     FILE.width(FTLEN * 2);                                               \
     FILE << NAME;                                                        \
     WRITESPACE(FILE)                                                     \
@@ -112,6 +112,8 @@ void conver2Gray(const std::string &inputpath, const std::string &outpath)
     FILE << YAW;                                                         \
     WRITESPACE(FILE)                                                     \
     FILE << ROLL;                                                        \
+    WRITESPACE(FILE)                                                     \
+    FILE << V;                                                           \
     FILE << endl;
 
 #define WRITEIMURAWDATA(FILE, TIME, GX, GY, GZ, AX, AY, AZ) \
@@ -139,6 +141,7 @@ void conver2Gray(const std::string &inputpath, const std::string &outpath)
  * @param oimpath  imu输出路径
  */
 void PreprocessData(const std::string &imgpath,
+                    const std::string &oimgpath,
                     const std::string &pstpath,
                     const std::string &imupath,
                     const std::string &outpath,
@@ -167,15 +170,25 @@ void PreprocessData(const std::string &imgpath,
         pIMUDataloader->loadData(imupath);
 
         cout << "begin writing datas." << endl;
-        WRITEPOSEDATA(pFile, "Name", "Time", "Lon", "Lat", "Alt", "Pitch", "Yaw", "Roll");
+        WRITEPOSEDATA(pFile, "Name", "Time", "Lon", "Lat", "Alt", "Pitch", "Yaw", "Roll","Vel");
         WRITEIMURAWDATA(pImu, "Time", "Gyro_x", "Gyro_y", "Gyro_z", "Acc_x", "Acc_y", "Acc_z");
 
         double bgtime = 0.0;
         double edtime = 0.0;
+
+     
         for (int i = 0; i < sz; ++i)
         {
             const std::string &imgname = fms[i].substr(fms[i].length() - 38);
             const double imgtime = M_Untils::GetDayTimeFromPicName(imgname);
+            Mat img = imread(fms[i], CV_LOAD_IMAGE_UNCHANGED);
+            std::string outfilename = oimgpath + imgname;
+
+            Mat grayimg;
+            cvtColor(img, grayimg, CV_RGB2GRAY);
+            printf("%s %d\n", outfilename.c_str(), grayimg.channels());
+            imwrite(outfilename, grayimg);
+
 
             const PoseData posedata = pPstDataLoader->getData(imgtime);
 
@@ -185,7 +198,8 @@ void PreprocessData(const std::string &imgpath,
                           posedata.pos.altitude,
                           posedata._pitch,
                           posedata._yaw,
-                          posedata._roll);
+                          posedata._roll,
+                          posedata._v);
 
             if (i > 0)
             {//from second frame
@@ -219,10 +233,27 @@ void PreprocessData(const std::string &imgpath,
     }
 }
 
+/* 处理原始数据
+*/
+void HandleOriginData()
+{
+    const std::string RootPath = "/media/navinfo/Bak/Datas/@@1002-0001-191107-00/";
+    PreprocessData( RootPath + "Output/LeftCamera/",
+                    RootPath + "Output/gray",
+                    RootPath + "Preprocess/1002-0001-191107-00.PosT",
+                    RootPath + "RawData/ROVER/imr.txt",
+                    RootPath + "Output/gray/pst.txt",
+                    RootPath + "Output/gray/imu.txt");
+
+}
+
+
 // main func
 int main(int argc, const char *argv[])
 {
 
+    HandleOriginData();
+    return 0;
     ORB_SLAM2::IMUPreintegrator imupre;
 
     CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",s_imgGray + "/imudatas.txt");
@@ -280,12 +311,16 @@ int main(int argc, const char *argv[])
     Mat t_R;
     Mat t_T;
 
+    Mat r_R;
+    Mat r_T;
+
 #define WIN_SIZE 1000
     Mat traj = Mat::zeros(WIN_SIZE, WIN_SIZE, CV_8UC3);
 
     CDataManager::getSingleton()->setIndicator(bg_no);
     Eigen::Vector3d total(0,0,0);
     int index = 0;
+    Mat result_t;
     for ( ++bgIter; bgIter != edIter; ++bgIter)
     {
         ++index;
@@ -293,29 +328,29 @@ int main(int argc, const char *argv[])
         cout << "imu data size : " << imudatas.size() << endl;
         double last_t ;//= (bgIter - 1)->second._t;
 
-        for(size_t i = 0; i < imudatas.size(); ++i)
-        {
-            if( i == imudatas.size() - 1)
-            {
-                last_t = bgIter->second._t;
-            }
-            else
-            {
-                last_t = imudatas[i + 1]._t;
-            }
+        // for(size_t i = 0; i < imudatas.size(); ++i)
+        // {
+        //     if( i == imudatas.size() - 1)
+        //     {
+        //         last_t = bgIter->second._t;
+        //     }
+        //     else
+        //     {
+        //         last_t = imudatas[i + 1]._t;
+        //     }
 
-            Eigen::Vector3d gyro(imudatas[i]._gyro_x,imudatas[i]._gyro_y,imudatas[i]._gyro_z);
-            Eigen::Vector3d acc(imudatas[i]._acc_x,imudatas[i]._acc_y,imudatas[i]._acc_z);
-            total += acc - Eigen::Vector3d(0,1.0,9.8);
-            if(acc.y() < 0)
-            {
-                cout << "total " << total << endl;
-            }
+        //     Eigen::Vector3d gyro(imudatas[i]._gyro_x,imudatas[i]._gyro_y,imudatas[i]._gyro_z);
+        //     Eigen::Vector3d acc(imudatas[i]._acc_x,imudatas[i]._acc_y,imudatas[i]._acc_z);
+        //     total += acc - Eigen::Vector3d(0,1.0,9.8);
+        //     // if(acc.y() < 0)
+        //     // {
+        //     //     cout << "total " << total << endl;
+        //     // }
         
-            double dt = last_t - imudatas[i]._t;
-            // imupre.update(gyro, acc, dt);
-            imupre.predict(acc,gyro,dt);
-        }
+        //     double dt = last_t - imudatas[i]._t;
+        //     // imupre.update(gyro, acc, dt);
+        //     imupre.predict(acc,gyro,dt);
+        // }
         // cout <<  "Velocity : " << (total) / index << endl;
         Mat curimg = imread(s_imgGray + bgIter->first, CV_LOAD_IMAGE_UNCHANGED);
         curFrame = new Frame;
@@ -352,15 +387,23 @@ int main(int argc, const char *argv[])
         PoseData prepose = (bgIter - 1)->second;
         double curtime = M_Untils::GetDayTimeFromPicName(s_imgGray + bgIter->first);
         PoseData curpose = bgIter->second;
-
-        Mat result_t;
+        cout << "pose " << curpose._roll << " " << curpose._pitch << " " << curpose._yaw << endl;
         static bool bol = false;
+        cv::Mat preMat = M_CoorTrans::IMU_to_ENU(-prepose._yaw,prepose._pitch,prepose._roll);
+        cv::Mat curMat = M_CoorTrans::IMU_to_ENU(-curpose._yaw,curpose._pitch,curpose._yaw);
+
+        cv::Mat dR;
+        cv::Mat dT;
+
+        M_Untils::GetRtFromPose(prepose, curpose, cam.RCam2Imu, cam.TCam2Imu,dR, dT);
+
         if (!bol)
         {
             orignPose = prepose;
             t_R = R.clone();
             t_T = t.clone();
-
+            r_R = dR.clone();
+            r_T = dT.clone();
             result_t = -R.inv() * t_T;
         }
         else
@@ -368,10 +411,14 @@ int main(int argc, const char *argv[])
    
             t_R = R * t_R;
             t_T = R * t_T + t;
-            result_t = -t_R.inv() * t_T;
 
+            r_R = dR * r_R;
+            r_T = dR * r_T + dT;
+
+            result_t = -t_R.inv() * t_T;
         }
-        writeRealTrace(realfile, prepose.pos, bgIter->first);
+
+        // writeRealTrace(realfile, prepose.pos, bgIter->first);
         const PtVector &curpts = curFrame->getCurMatchPts();
 
         char ottxt[255] = {0};
@@ -390,7 +437,7 @@ int main(int argc, const char *argv[])
 
         Point3d residual = estgauss - realgauss;
 
-        writeEstTrace(estfile, _blh, residual, bgIter->first);
+        // writeEstTrace(estfile, _blh, residual, bgIter->first);
 
         //system("free -h");
         Mat t_t = Mat::eye(4, 4, CV_64F);
@@ -403,9 +450,19 @@ int main(int argc, const char *argv[])
         KeyFrame *kframe = new KeyFrame();
         kframe->SetWorldPos(t_t);
         pMap->push(kframe);
+
+
+        r_R.copyTo(t_t.rowRange(0, 3).colRange(0, 3)); //
+        r_T.copyTo(t_t.rowRange(0, 3).col(3));
+        kframe = new KeyFrame();
+        kframe->SetWorldPos(t_t);
+        pMap->pushReal(kframe);
         // cout << "imu pre pose : " << imupre.getDeltaP() << endl;
         // cout << "v   get pose : " << result_t << endl;
-        pMap->insertIMUPose(imupre.getDeltaP());
+        // pMap->insertIMUPose(imupre.getDeltaP());
+       
+
+       
 
         pretime = curtime;
         if(!bol)

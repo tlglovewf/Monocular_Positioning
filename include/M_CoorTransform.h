@@ -116,8 +116,15 @@ public:
                         0, 0, 1);
         return yawR * pitchR * rollR;
     }
-
   
+    //获取imu到xyz转换矩阵
+    static cv::Mat IMU_to_XYZ(double yaw, double pitch, double roll, double B, double L)
+    {
+        cv::Mat xyz2enu = XYZ_to_ENU(B,L);
+        cv::Mat imu2enu = IMU_to_ENU(yaw,pitch,roll);
+        return  xyz2enu.inv() * imu2enu;
+    }
+    
    //经纬度转高斯投影坐标（B 维度  L 精度   H 高程)
    static Point3d BLH_to_GaussPrj(const BLHCoordinate &BLH, Datum datum = WGS84Datum)//,double lon)
    {

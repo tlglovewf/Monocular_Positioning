@@ -81,9 +81,9 @@ PoseVector &Stim300PostTDataLoader::loadData(const std::string &path)
 #define POSITIVENUM(x) (x) //  (x < 0) ? (360 + x) : x
 
                 item._pitch = POSITIVENUM(pitch);
-                item._roll = POSITIVENUM(roll);
-                item._yaw = POSITIVENUM(yaw);
-
+                item._roll  = POSITIVENUM(roll);
+                item._yaw   = POSITIVENUM(yaw);
+                item._v     = hzspeed;
                 mPoseDatas.emplace_back(item);
             }
             std::cout << mPoseDatas.size() << "pst datas load successfully!!!" << std::endl;
@@ -148,11 +148,13 @@ PoseData Stim300PostTDataLoader::getData(double t)
         double yaw =
             M_Untils::GetLxValue(t, predata._t, curdata._t, predata._yaw, curdata._yaw);
 
+        double v = M_Untils::GetLxValue(t, predata._t, curdata._t, predata._v, curdata._v);
+
         //        interval.prompt("Getting posedata costs ");
 
         mIndicator = it; //设置指针
 
-        return PoseData{t, {lat, lon, h}, pitch, roll, yaw};
+        return PoseData{t, {lat, lon, h}, pitch, roll, yaw,v};
     }
     else
     {

@@ -86,6 +86,10 @@ public:
         return mMpPoints;
     }
     
+    std::vector<KeyFrame*> GetAllRealKeyFrames()const
+    {
+        return mRealKeyFrames;
+    }
     std::vector<KeyFrame*> GetAllKeyFrames()const
     {
         return mKeyFrames;
@@ -99,7 +103,10 @@ public:
     {
         mKeyFrames.emplace_back(keyframe);
     }
-
+    void pushReal(KeyFrame *keyframe)
+    {
+        mRealKeyFrames.emplace_back(keyframe);
+    }
     void insertIMUPose(const Eigen::Vector3d &imu)
     {
         mImuPos.emplace_back(imu);
@@ -112,6 +119,7 @@ public:
 protected:
     std::vector<MapPoint*> mMpPoints;
     std::vector<KeyFrame*> mKeyFrames;
+    std::vector<KeyFrame*> mRealKeyFrames;
     std::vector<Eigen::Vector3d> mImuPos;
 };
 
@@ -124,6 +132,7 @@ public:
 
     void DrawMapPoints();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph);
+    void DrawRealKeyFrames();
     void DrawCurrentCamera(pangolin::OpenGlMatrix &Twc);
     void SetCurrentCameraPose(const cv::Mat &Tcw);
     void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
