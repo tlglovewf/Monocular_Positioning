@@ -91,7 +91,10 @@ ${PROJECT_SOURCE_DIR}/../ThirdParty/g2o/lib/libg2o.so
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Output/)
 
+# add_executable(WeiyaDataPreProcess
+# PosEstimate/main.cpp)
+# target_link_libraries(WeiyaDataPreProcess ${PROJECT_NAME})
+
 add_executable(PosEstEx
 PosEstimate/main.cpp)
 target_link_libraries(PosEstEx ${PROJECT_NAME})
-

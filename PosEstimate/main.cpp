@@ -235,15 +235,33 @@ void PreprocessData(const std::string &imgpath,
 
 /* 处理原始数据
 */
-void HandleOriginData()
+void HandleOriginData(const string &path)
 {
-    const std::string RootPath = "/media/navinfo/Bak/Datas/@@1002-0001-191107-00/";
-    PreprocessData( RootPath + "Output/LeftCamera/",
-                    RootPath + "Output/gray",
-                    RootPath + "Preprocess/1002-0001-191107-00.PosT",
-                    RootPath + "RawData/ROVER/imr.txt",
-                    RootPath + "Output/gray/pst.txt",
-                    RootPath + "Output/gray/imu.txt");
+
+    cv::FileStorage fSetting(path,cv::FileStorage::READ);
+
+    std::string rootpath;
+    std::string imagepath;
+    std::string outputpath;
+    std::string postfilepath;
+    std::string imurawpath;
+    std::string pstpath;
+    std::string imupath;
+    
+    fSetting["RootPath"]     >> rootpath;
+    fSetting["ImagePath"]    >> imagepath;
+    fSetting["OutPutPath"]   >> outputpath;
+    fSetting["PosTFilePath"] >> postfilepath;
+    fSetting["ImuRawPath"]   >> imurawpath;
+    fSetting["PstPath"]      >> pstpath;
+    fSetting["ImuPath"]      >> imupath;
+
+    PreprocessData( rootpath + imagepath,
+                    rootpath + outputpath,
+                    rootpath + postfilepath,
+                    rootpath + imurawpath,
+                    rootpath + pstpath,
+                    rootpath + imupath  );
 
 }
 
@@ -251,9 +269,13 @@ void HandleOriginData()
 // main func
 int main(int argc, const char *argv[])
 {
-
-    HandleOriginData();
-    return 0;
+    // if(argc < 2)
+    // {
+    //     cout << "please input config file path ." << endl;
+    //     return -1;
+    // }
+    // HandleOriginData(argv[1]);
+    // return 0;
     ORB_SLAM2::IMUPreintegrator imupre;
 
     CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",s_imgGray + "/imudatas.txt");

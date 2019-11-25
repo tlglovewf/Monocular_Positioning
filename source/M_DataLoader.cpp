@@ -260,9 +260,6 @@ ImuRawData STIM300IMURawDataLoader::getRawData(double sec, const IMURawVIter &it
 
     cout.precision(20);
 
-    cout << predata._t << endl;
-    cout << nxtdata._t << endl;
-
     //拉格朗日差值
     double gx = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._gyro_x, nxtdata._gyro_x);
     double gy = M_Untils::GetLxValue(sec, predata._t, nxtdata._t, predata._gyro_y, nxtdata._gyro_y);
