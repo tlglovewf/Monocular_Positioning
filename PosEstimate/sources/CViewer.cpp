@@ -98,12 +98,12 @@ void Viewer::Run()
         mpMapDrawer->DrawIMUPose();
         pangolin::FinishFrame();
 
-        //        cv::Mat im = mpFrameDrawer->DrawFrame();
+        // cv::Mat im = mpFrameDrawer->DrawFrame();
 
-        //        cv::Mat o_im;
-        //        cv::resize(im, o_im, cv::Size(im.cols/2.0,im.rows/2.0));
-        //        cv::imshow("ORB-SLAM2: Current Frame",o_im);
-        //        cv::waitKey(mT);
+        // cv::Mat o_im;
+        // cv::resize(im, o_im, cv::Size(im.cols/2.0,im.rows/2.0));
+        // cv::imshow("ORB-SLAM2: Current Frame",o_im);
+        // cv::waitKey(1);
 
         if (menuReset)
         {

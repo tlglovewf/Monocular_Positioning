@@ -41,16 +41,29 @@ const float s_ImgDis = 4.0;
 const int   s_stNo = 0;
 #else
 
-const string s_imgRoot = "/media/navinfo/Bak/Datas/@@1002-0001-190828-00/Output/";
+// const string s_imgRoot = "/media/navinfo/Bak/Datas/@@1002-0001-190828-00/Output/";
 
-const string s_imgPath = s_imgRoot + "LeftCamera/";
+// const string s_imgPath = s_imgRoot + "LeftCamera/";
+// const string s_imgGray = s_imgRoot + "gray/";
+// const string s_excfg = s_imgRoot + "/extrinsics.xml";
+// const string s_bscfg = s_imgRoot + "0001-1220.bs";
+// const string s_pstpath = s_imgRoot + "/1002-0001-190828-00.PosT";
+// const string s_imupath = s_imgRoot + "/imu190828_071742.txt";
+// const float s_ImgDis = 1.0;
+// const int s_stNo = ;0 //2140;
+
+
+const string s_imgRoot = "/media/navinfo/Bak/Datas/@@1002-0001-191122-03/";
+
+const string s_imgPath = s_imgRoot + "/";
 const string s_imgGray = s_imgRoot + "gray/";
 const string s_excfg = s_imgRoot + "/extrinsics.xml";
-const string s_bscfg = s_imgRoot + "0001-1220.bs";
-const string s_pstpath = s_imgRoot + "/1002-0001-190828-00.PosT";
-const string s_imupath = s_imgRoot + "/imu190828_071742.txt";
+const string s_bscfg = s_imgRoot + "BS_0001_20191105.bs";
+const string s_pstpath = s_imgRoot + "/1002-0001-191122-03-base.PosT";
+const string s_imupath = s_imgRoot + "/imr.txt";
 const float s_ImgDis = 1.0;
-const int s_stNo = 640; //2140;
+const int s_stNo = 1600;//1600; //2140;
+
 #endif
 
 const string s_o_rel = "/media/navinfo/Bak/CPP/QT/real.txt";
@@ -276,9 +289,11 @@ int main(int argc, const char *argv[])
     // }
     // HandleOriginData(argv[1]);
     // return 0;
+    cout.precision(20);
+ 
     ORB_SLAM2::IMUPreintegrator imupre;
 
-    CDataManager::getSingleton()->LoadData(s_imgGray + "/pstdatas.txt",s_imgGray + "/imudatas.txt");
+    CDataManager::getSingleton()->LoadData(s_imgGray + "/pst.txt",s_imgGray + "/imu.txt");
 
     FrameDrawer *pFdrawer = NULL;
     Map *pMap = new Map();
@@ -292,9 +307,6 @@ int main(int argc, const char *argv[])
 
     Camera cam;
     pConfig->ReadConfig(cam);
-
-    //cv track method
-    // Ptr<IFeatureTrack> track = new CVFeatureTrack();
 
     Ptr<IFeatureTrack> track = new ORBFeatureTrack();
 
@@ -326,6 +338,20 @@ int main(int argc, const char *argv[])
     estfile.open(s_o_est);
     realfile.precision(15);
     estfile.precision(15);
+
+    CDataManager::getSingleton()->setIndicator(bg_no);
+
+#if 0
+    for(; bgIter != edIter; ++bgIter)
+    {
+        writeRealTrace(realfile,bgIter->second.pos,bgIter->first.substr(28,4));
+        // if(bgIter->second.pos.longitude > 114.44)
+        {
+            cout << "------------------" << bgIter->second.pos.longitude << " " << bgIter->second.pos.latitude << endl;
+        }
+    }
+#endif
+
     BLHCoordinate espos;
 
     PoseData orignPose;
@@ -347,9 +373,9 @@ int main(int argc, const char *argv[])
     {
         ++index;
         IMURawVector imudatas = CDataManager::getSingleton()->getIMUDataFromLastTime(bgIter->second._t);
-        cout << "imu data size : " << imudatas.size() << endl;
+        // cout << "imu data size : " << imudatas.size() << endl;
         double last_t ;//= (bgIter - 1)->second._t;
-
+        cout << "img " << bgIter->first.c_str() << endl;
         // for(size_t i = 0; i < imudatas.size(); ++i)
         // {
         //     if( i == imudatas.size() - 1)
@@ -409,7 +435,8 @@ int main(int argc, const char *argv[])
         PoseData prepose = (bgIter - 1)->second;
         double curtime = M_Untils::GetDayTimeFromPicName(s_imgGray + bgIter->first);
         PoseData curpose = bgIter->second;
-        cout << "pose " << curpose._roll << " " << curpose._pitch << " " << curpose._yaw << endl;
+        // cout << "pose " << curpose._roll << " " << curpose._pitch << " " << curpose._yaw << endl;
+        cout << "pose " << curpose.pos.longitude << " " << curpose.pos.latitude << endl;
         static bool bol = false;
         cv::Mat preMat = M_CoorTrans::IMU_to_ENU(-prepose._yaw,prepose._pitch,prepose._roll);
         cv::Mat curMat = M_CoorTrans::IMU_to_ENU(-curpose._yaw,curpose._pitch,curpose._yaw);
@@ -483,8 +510,12 @@ int main(int argc, const char *argv[])
         // cout << "v   get pose : " << result_t << endl;
         // pMap->insertIMUPose(imupre.getDeltaP());
        
+       cv::Mat mat;
+        resize(curimg,mat,cv::Size(curimg.cols >> 2, curimg.rows >> 2));
 
-       
+
+        cv::imshow("test",mat);
+        cv::waitKey(1);   
 
         pretime = curtime;
         if(!bol)
@@ -494,7 +525,7 @@ int main(int argc, const char *argv[])
         }
     }
 
-    getchar();
+//     getchar();
     realfile.close();
     estfile.close();
 

@@ -86,5 +86,5 @@ void ORBFeatureTrack::match( Frame *preframe, Frame *curframe, MatchVector &mtve
         
     }
     std::count(vMatched.begin(), vMatched.end(),-1);
-    printf("matches point %d\n", mtvecotr.size());
+    // printf("matches point %d\n", mtvecotr.size());
 }
