@@ -1,0 +1,26 @@
+%YAML:1.0
+
+#---------------------------------
+#weiya data preprocess config file
+#---------------------------------
+
+#root path
+RootPath: "/media/navinfo/Bak/Datas/@@1002-0001-191122-03/"
+
+#image path(relative with root path)
+ImagePath: "LeftCamera/"
+
+#gray image output path
+OutPutPath: "gray/"
+
+#post file path 
+PosTFilePath: "1002-0001-191122-03-base.PosT"
+
+#imu raw data file
+ImuRawPath: "imr.txt"
+
+#post + img info output file
+PstPath: "gray/pst.txt"
+
+#img + imu info output file
+ImuPath: "gray/imu.txt"
