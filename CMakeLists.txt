@@ -50,7 +50,7 @@ ${PROJECT_SOURCE_DIR}/PosEstimate
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
 ${CHOLMOD_INCLUDE_DIR}
-${PROJECT_SOURCE_DIR}/../ThirdParty/
+# ${PROJECT_SOURCE_DIR}/../ThirdParty/
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -70,7 +70,7 @@ PosEstimate/sources/CDataManager.cpp
 PosEstimate/IMU/IMUPreintegrator.cpp
 PosEstimate/IMU/imudata.cpp
 PosEstimate/IMU/so3.cpp
-PosEstimate/IMU/g2otypes.cpp
+# PosEstimate/IMU/g2otypes.cpp
 PosEstimate/IMU/NavState.cpp
 source/M_DataLoader.cpp
 source/M_Config.cpp
@@ -84,7 +84,7 @@ ${Pangolin_LIBRARIES}
 cholmod
 ${CHOLMOD_LIBRARIES}
 #${PROJECT_SOURCE_DIR}/ThirdParty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/../ThirdParty/g2o/lib/libg2o.so
+# ${PROJECT_SOURCE_DIR}/../ThirdParty/g2o/lib/libg2o.so
 )
 
 # Build examples
