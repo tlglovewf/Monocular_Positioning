@@ -53,7 +53,7 @@ const int   s_stNo = 0;
 // const int s_stNo = ;0 //2140;
 
 
-const string s_imgRoot = "/media/navinfo/Bak/Datas/@@1002-0001-191122-03/";
+const string s_imgRoot = "/media/tu/Work/Datas/@@1002-0001-191122-03/";
 
 const string s_imgPath = s_imgRoot + "/";
 const string s_imgGray = s_imgRoot + "gray/";

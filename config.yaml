@@ -5,16 +5,16 @@
 #---------------------------------
 
 #root path
-RootPath: "/media/navinfo/Bak/Datas/@@1002-0001-191122-03/"
+RootPath: "/media/tu/Work/Datas/@@1002-0001-190828-00/Output"
 
 #image path(relative with root path)
 ImagePath: "LeftCamera/"
 
 #gray image output path
-OutPutPath: "gray/"
+OutPutPath: "../gray/"
 
 #post file path 
-PosTFilePath: "1002-0001-191122-03-base.PosT"
+PosTFilePath: "1002-0001-190828-00.PosT"
 
 #imu raw data file
 ImuRawPath: "imr.txt"
