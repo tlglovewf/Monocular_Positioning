@@ -10,13 +10,6 @@
 #include <algorithm>
 #include "M_Utils.h"
 #include "CFuncHelper.h"
-#include "M_CoorTransform.h"
-#include "M_Config.h"
-#include "M_DataLoader.h"
-#include "CFeatureTrack.h"
-#include <thread>
-#include "algorithm"
-
 #include "CDataManager.h"
 
 using namespace cv;

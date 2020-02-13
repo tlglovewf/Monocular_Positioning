@@ -7,23 +7,9 @@
 //
 
 #include <fstream>
-#include <algorithm>
 #include "M_Utils.h"
 #include "CFuncHelper.h"
-#include "M_CoorTransform.h"
-#include "M_Config.h"
 #include "M_DataLoader.h"
-#include "CFeatureTrack.h"
-#include "COptimizer.h"
-#include "CFrame.h"
-#include "CMap.h"
-#include "CViewer.h"
-#include <thread>
-#include "algorithm"
-
-#include "CDataManager.h"
-
-#include "IMU/IMUPreintegrator.h"
 
 using namespace cv;
 using namespace std;
